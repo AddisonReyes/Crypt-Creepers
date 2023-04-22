@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] int health = 3;
     [SerializeField] float speed = 0.0f;
+    [SerializeField] float fireRate = 1;
+
     [SerializeField] Transform aim;
-    [SerializeField] Camera camera;
+    [SerializeField] new Camera camera;
+    [SerializeField] Transform bulletPrefab;
+
+    bool gunLoaded = true;
 
     float horizontal;
     float vertical;
@@ -35,5 +41,30 @@ public class Player : MonoBehaviour
         facingDirection = camera.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         aim.position = transform.position + (Vector3)facingDirection.normalized;
         
+        // Bullet
+        if (Input.GetMouseButton(0) && gunLoaded) 
+        {
+            gunLoaded = false;
+            float angle = Mathf.Atan2(facingDirection.y, facingDirection.x) * Mathf.Rad2Deg;
+            Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            Instantiate(bulletPrefab, transform.position, targetRotation);
+            StartCoroutine(ReloadGun());
+        }
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void TakeDamage()
+    {
+        health--;
+    }
+
+    IEnumerator ReloadGun()
+    {
+        yield return new WaitForSeconds(1/fireRate);
+        gunLoaded = true;
     }
 }
