@@ -7,11 +7,15 @@ public class Player : MonoBehaviour
     [SerializeField] int health = 3;
     [SerializeField] float speed = 0.0f;
     [SerializeField] float fireRate = 1;
+    
+    bool invensibility = false;
+    [SerializeField] int invensibilityTime = 3;
 
     [SerializeField] Transform aim;
     [SerializeField] new Camera camera;
     [SerializeField] Transform bulletPrefab;
-
+    
+    bool powerShotEnabled = false;
     bool gunLoaded = true;
 
     float horizontal;
@@ -47,7 +51,14 @@ public class Player : MonoBehaviour
             gunLoaded = false;
             float angle = Mathf.Atan2(facingDirection.y, facingDirection.x) * Mathf.Rad2Deg;
             Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
-            Instantiate(bulletPrefab, transform.position, targetRotation);
+            
+            Transform bulletClone = Instantiate(bulletPrefab, transform.position, targetRotation);
+
+            if (powerShotEnabled)
+            {
+                bulletClone.GetComponent<Bullet>().powerShot = true;
+            }
+
             StartCoroutine(ReloadGun());
         }
 
@@ -59,12 +70,48 @@ public class Player : MonoBehaviour
 
     public void TakeDamage()
     {
-        health--;
+        if (invensibility)
+        {
+            StartCoroutine(Invensibility());
+        }
+        else
+        {
+            invensibility = true;
+            health--;
+        }
     }
 
     IEnumerator ReloadGun()
     {
         yield return new WaitForSeconds(1/fireRate);
         gunLoaded = true;
+    }
+
+    IEnumerator Invensibility()
+    {
+        yield return new WaitForSeconds(invensibilityTime);
+        invensibility = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("PowerUp"))
+        {
+            switch(collision.GetComponent<PowerUp>().powerUpType)
+            {
+                case PowerUp.PowerUpType.FireRateIncrease:
+                    fireRate++;
+                    break;
+
+                case PowerUp.PowerUpType.PowerShot:
+                    powerShotEnabled = true;
+                    break;
+
+                default:
+                    break;
+            }
+
+            Destroy(collision.gameObject, 0.1f);
+        }
     }
 }

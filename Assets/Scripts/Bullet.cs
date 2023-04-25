@@ -6,9 +6,11 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] float speed = 6;
     [SerializeField] int bulletDamage = 5;
+    [SerializeField] int health = 3;
+    public bool powerShot = false;
 
     // Start is called before the first frame update
-    private void Start()
+    void Start()
     {
         Destroy(gameObject, 6);
     }
@@ -24,7 +26,17 @@ public class Bullet : MonoBehaviour
         if (collision.CompareTag("Enemy"))
         {
             collision.GetComponent<Enemy>().TakeDamage(bulletDamage);
-            Destroy(gameObject);
+
+            if(!powerShot)
+            {
+                Destroy(gameObject);
+            }
+
+            health--;
+            if (health <= 0)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

@@ -5,13 +5,16 @@ using UnityEngine;
 public class ItemSpawner : MonoBehaviour
 {
     [SerializeField] GameObject checkPointPrefab;
-    [SerializeField] int SpawnDelay = 10;
+    [SerializeField] GameObject[] powerUpPrefab;
+    [SerializeField] int SpawnDelay = 3;
+    [SerializeField] int PowerUpSpawnDelay = 3;
     [SerializeField] float spawnRadius = 10;
 
     // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(SpawnCheckPointRutine());
+        StartCoroutine(SpawnPowerUpRoutine());
     }
 
     // Update is called once per frame
@@ -28,6 +31,19 @@ public class ItemSpawner : MonoBehaviour
             Vector2 randomPosition = Random.insideUnitCircle * spawnRadius;
 
             Instantiate(checkPointPrefab, randomPosition, Quaternion.identity);
+        }
+    }
+
+    IEnumerator SpawnPowerUpRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(PowerUpSpawnDelay);
+            Vector2 randomPosition = Random.insideUnitCircle * spawnRadius;
+
+            int random = Random.Range(0, powerUpPrefab.Length);
+
+            Instantiate(powerUpPrefab[random], randomPosition, Quaternion.identity);
         }
     }
 }
