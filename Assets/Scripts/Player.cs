@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] int health = 3;
-    [SerializeField] float speed = 0.0f;
+    public float speed = 0.0f;
     [SerializeField] float fireRate = 1;
     
     bool invensibility = false;
@@ -62,22 +62,23 @@ public class Player : MonoBehaviour
             StartCoroutine(ReloadGun());
         }
 
-        if (health <= 0)
-        {
-            //Destroy(gameObject);
-        }
+        
     }
 
     public void TakeDamage()
     {
         if (invensibility)
         {
-            StartCoroutine(Invensibility());
+            return;            
         }
-        else
+
+        health--;
+        invensibility = true;
+        StartCoroutine(Invensibility());
+
+        if (health <= 0)
         {
-            invensibility = true;
-            health--;
+            //Destroy(gameObject);
         }
     }
 

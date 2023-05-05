@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] int health = 10;
     [SerializeField] float speed = 1;
+    [SerializeField] int scorePoints = 100;
     Transform player;
 
     // Start is called before the first frame update
@@ -25,14 +26,18 @@ public class Enemy : MonoBehaviour
 
         if (health <= 0)
         {
+            GameManager.Instance.Score += scorePoints;
             Destroy(gameObject);
         }
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.CompareTag("Player"))
+        
+
+        if (collision.gameObject.CompareTag("Player"))
         {
-            collision.GetComponent<Player>().TakeDamage();
+            collision.gameObject.GetComponent<Player>().TakeDamage();
         }
     }
 
