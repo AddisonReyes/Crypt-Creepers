@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     [SerializeField] Transform aim;
     [SerializeField] new Camera camera;
     [SerializeField] Transform bulletPrefab;
+    [SerializeField] Animator anim;
+    [SerializeField] SpriteRenderer spriteRenderer;
     
     bool powerShotEnabled = false;
     bool gunLoaded = true;
@@ -24,10 +26,20 @@ public class Player : MonoBehaviour
     Vector3 moveDirection;
     Vector2 facingDirection;
 
+    public int Health
+    {
+        get => health;
+        set
+        {
+            health = value;
+            UIManager.Instance.UpdateUIHealth(Health);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        Health = health;
     }
 
     // Update is called once per frame
@@ -62,7 +74,16 @@ public class Player : MonoBehaviour
             StartCoroutine(ReloadGun());
         }
 
-        
+        anim.SetFloat("Speed", moveDirection.magnitude);
+        if (aim.position.x > transform.position.x)
+        {
+            spriteRenderer.flipX = true;
+        }
+        else if (aim.position.x < transform.position.x)
+        {
+            spriteRenderer.flipX = false;
+        }
+
     }
 
     public void TakeDamage()
@@ -72,13 +93,14 @@ public class Player : MonoBehaviour
             return;            
         }
 
-        health--;
+        Health--;
         invensibility = true;
         StartCoroutine(Invensibility());
 
-        if (health <= 0)
+        if (Health <= 0)
         {
-            //Destroy(gameObject);
+            GameManager.Instance.gameOver = true;
+            UIManager.Instance.ShowGameOverScreen();
         }
     }
 
